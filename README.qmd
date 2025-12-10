@@ -12,6 +12,23 @@ jupyter: python3
 
 This code looks into NBA team statistics for the 2022-23, 2023-24, and 2024-25 seasons. The statistics include basic box score stats and advanced statistics all taken from <a href="https://www.sports-reference.com/">. 
 
+## Loading Data and Models
+
+This chunk of code loads imports pandas and the NBA basic and advanced statistics datasets for the 2022–23, 2023–24, and 2024–25 NBA seasons. It also assigns them to variable names.
+
+```{python}
+#| eval: false
+#| echo: true
+import pandas as pd
+
+basic_2425 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA Basic 24-25.csv")
+adv_2425 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA ADV 24-25.csv", header=1)
+basic_2324 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA 2023-24 Basic.csv")
+adv_2324 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA 2023-24 ADV.csv", header=1)
+basic_2223 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA 2022-23 Basic.csv")
+adv_2223 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA 2022-23 ADV.csv", header=1)
+
+```
 ### Cleaning the Data
 
 In this code, I added a season column for each dataset to help distinguish the different season for each team. After that, I combined all basic and advanced stats together. After getting that, I merged both the advanced stats and basic stats on team name and season into one big dataset called "nba_all." I then cleaned columns I didn't need such as "Rk_x", "Unnamed" and "Rk_y." Finally, I took out the League average column and took out the * at the end of team names which means the team made the playoffs. 
@@ -125,21 +142,4 @@ plt.show()
 
 To answer this, I decided to create a barplot that shows the change in net rating for teams from the 2023-24 and 2024-25 season. According to the bar plot, the teams that improved the most in net rating were the Memphis Grizlies, Detroit Pistons, and Cleveland Cavaliers. This improvement is tied to changes in the teams roster such as adding star players or making trades to improve the roster around already present star players. 
 
-## Loading Data and Models
-
-This chunk of code loads imports pandas and the NBA basic and advanced statistics datasets for the 2022–23, 2023–24, and 2024–25 NBA seasons. It also assigns them to variable names.
-
-```{python}
-#| eval: false
-#| echo: true
-import pandas as pd
-
-basic_2425 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA Basic 24-25.csv")
-adv_2425 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA ADV 24-25.csv", header=1)
-basic_2324 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA 2023-24 Basic.csv")
-adv_2324 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA 2023-24 ADV.csv", header=1)
-basic_2223 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA 2022-23 Basic.csv")
-adv_2223 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA 2022-23 ADV.csv", header=1)
-
-```
 
