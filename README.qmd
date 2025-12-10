@@ -1,0 +1,144 @@
+---
+title: "Exploring NBA Data"
+format: gfm
+execute: 
+  warning: false
+  message: false
+  errors: false
+jupyter: python3
+---
+
+## Introduction
+
+This code looks into NBA team statistics for the 2022-23, 2023-24, and 2024-25 seasons. The statistics include basic box score stats and advanced statistics all taken from <a href="https://www.sports-reference.com/">. 
+
+### Cleaning the Data
+
+In this code, I added a season column for each dataset to help distinguish the different season for each team. After that, I combined all basic and advanced stats together. After getting that, I merged both the advanced stats and basic stats on team name and season into one big dataset called "nba_all." I then cleaned columns I didn't need such as "Rk_x", "Unnamed" and "Rk_y." Finally, I took out the League average column and took out the * at the end of team names which means the team made the playoffs. 
+
+```{python}
+basic_2425["season"] = "2024-25"
+adv_2425["season"]   = "2024-25"
+
+basic_2324["season"] = "2023-24"
+adv_2324["season"]   = "2023-24"
+
+basic_2223["season"] = "2022-23"
+adv_2223["season"]   = "2022-23"
+
+basic_all = pd.concat([basic_2425, basic_2324, basic_2223], ignore_index=True)
+adv_all   = pd.concat([adv_2425, adv_2324, adv_2223], ignore_index=True)
+
+nba_all = pd.merge(basic_all, adv_all, on=["Team", "season"], how = 'left')
+cols_to_drop = ["Rk_x", "Rk_y"]
+cols_to_drop += [c for c in nba_all.columns if c.startswith("Unnamed:")]
+nba_all = nba_all.drop(columns=cols_to_drop, errors='ignore')
+
+nba_all["Team"] = nba_all["Team"].str.replace("*", "", regex=False).str.strip()
+nba_all = nba_all[nba_all["Team"] != "League Average"]
+
+nba_all = nba_all.reset_index(drop=True)
+```
+
+## Question 1: Which Advanced Stats Explain Winning?
+
+```{python}
+#| echo: true
+#| messages: false
+#| warnings: false
+# Create win percentage
+nba_all["win_pct"] = nba_all["W"] / nba_all["G"]
+
+stats_to_test = [
+    "ORtg", "DRtg", "NRtg", "efg_pct", "ts_pct",
+    "tov_pct", "orb_pct", "FTr", "Pace"
+]
+
+corr_df = nba_all[["win_pct"] + stats_to_test].corr()
+```
+
+```{python}
+
+#| messages: false
+#| warnings: false
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 7))
+sns.heatmap(corr_df, annot=True, cmap="coolwarm", fmt=".2f")
+plt.title("Correlation Between Advanced Stats and Winning")
+plt.show()
+```
+
+To answer this question, I decided to create a heatmap that shows the correlation between advanced statistics and win percentage. Based on the results of the heatmap, it is shown that the most important advanced statistics for winning games is eFG% and TS%. This suggest that if you want to win more games you have to find efficient players who shoot the ball well. 
+
+## Question 2: What is More Important Offense or Defense?
+```{python}
+#| echo: true
+#| messages: false
+#| warnings: false
+
+import statsmodels.formula.api as smf
+
+model = smf.ols("win_pct ~ ORtg + DRtg", data=nba_all).fit()
+print(model.summary())
+
+sns.scatterplot(data=nba_all, x="ORtg", y="win_pct")
+sns.regplot(data=nba_all, x="ORtg", y="win_pct", scatter=False, color="red")
+plt.title("Offensive Rating vs Win %")
+plt.show()
+
+sns.scatterplot(data=nba_all, x="DRtg", y="win_pct")
+sns.regplot(data=nba_all, x="DRtg", y="win_pct", scatter=False, color="red")
+plt.title("Defensive Rating vs Win %")
+plt.show()
+```
+
+For this question, I decided to create a regression and scatterplots to show the effect of offensive and defensive rating on win percentage. The results show that both offense and defense are important to winning. The The *R*-squared for this model is high at `{python} str(model.rsquared.round(3))`. Offensive Rating had a coefficient of 0.0281, while defensive ratings coefficient was -0.0274. Defensive coefficient was negative, but this makes sense as you want a lower rating as you are giving up less points per 100 possessions. People view the NBA as an offensive game, so this can explain the results shown. 
+
+## Question 3: Which Teams Improved the Most from 2023-24 to 2024-25?
+
+```{python}
+#| echo: true
+#| messages: false
+#| warnings: false
+
+nba_all["season_num"] = nba_all["season"].astype(str).str[:4].astype(int)
+
+nba_all = nba_all.sort_values(["Team", "season_num"])
+
+nba_all["NRtg_change"] = nba_all.groupby("Team")["NRtg"].diff()
+
+improvement = nba_all[nba_all["season"] == "2024-25"][["Team", "NRtg_change"]].dropna()
+improvement = improvement.sort_values("NRtg_change", ascending=False)
+
+improvement.head(10).to_markdown()
+
+plt.figure(figsize=(14,8))
+sns.barplot(data=top_changes, x="NRtg_change", y="Team", palette="viridis")
+plt.title("Most Improved Teams in Net Rating (2023-24 → 2024-25)")
+plt.xlabel("Change in Net Rating")
+plt.ylabel("Team")
+plt.show()
+```
+
+To answer this, I decided to create a barplot that shows the change in net rating for teams from the 2023-24 and 2024-25 season. According to the bar plot, the teams that improved the most in net rating were the Memphis Grizlies, Detroit Pistons, and Cleveland Cavaliers. This improvement is tied to changes in the teams roster such as adding star players or making trades to improve the roster around already present star players. 
+
+## Loading Data and Models
+
+This chunk of code loads imports pandas and the NBA basic and advanced statistics datasets for the 2022–23, 2023–24, and 2024–25 NBA seasons. It also assigns them to variable names.
+
+```{python}
+#| eval: false
+#| echo: true
+import pandas as pd
+
+basic_2425 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA Basic 24-25.csv")
+adv_2425 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA ADV 24-25.csv", header=1)
+basic_2324 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA 2023-24 Basic.csv")
+adv_2324 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA 2023-24 ADV.csv", header=1)
+basic_2223 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA 2022-23 Basic.csv")
+adv_2223 = pd.read_csv("C:/Users/jackm/OneDrive/Documents/Data Wrangling/NBA 2022-23 ADV.csv", header=1)
+
+```
+
