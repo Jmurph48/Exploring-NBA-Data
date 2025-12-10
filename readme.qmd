@@ -1,9 +1,11 @@
-# Exploring NBA Data
-
+---
+title: "Exploring NBA Data"
+format: gfm
+---
 
 ## Intro
 
-``` python
+```{python}
 import pandas as pd
 
 
@@ -37,15 +39,8 @@ nba_all = nba_all[nba_all["Team"] != "League Average"]
 nba_all = nba_all.reset_index(drop=True)
 
 nba_all.columns
-```
 
-    Index(['Team', 'G', 'MP', 'FG', 'FGA', 'FG%', '3P', '3PA', '3P%', '2P', '2PA',
-           '2P%', 'FT', 'FTA', 'FT%', 'ORB', 'DRB', 'TRB', 'AST', 'STL', 'BLK',
-           'TOV', 'PF', 'PTS', 'season', 'Age', 'W', 'L', 'PW', 'PL', 'MOV', 'SOS',
-           'SRS', 'ORtg', 'DRtg', 'NRtg', 'Pace', 'FTr', '3PAr', 'TS%', 'eFG%',
-           'TOV%', 'ORB%', 'FT/FGA', 'eFG%.1', 'TOV%.1', 'DRB%', 'FT/FGA.1',
-           'Arena', 'Attend.', 'Attend./G'],
-          dtype='object')
+```
 
 ## Data
 
