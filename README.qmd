@@ -10,7 +10,7 @@ jupyter: python3
 
 ## Introduction
 
-This code looks into NBA team statistics for the 2022-23, 2023-24, and 2024-25 seasons. The statistics include basic box score stats and advanced statistics all taken from <a href="https://www.sports-reference.com/">. 
+This code looks into NBA team statistics for the 2022-23, 2023-24, and 2024-25 seasons. The statistics include basic box score stats and advanced statistics all taken from <a href="https://www.sports-reference.com/">. In this README, I demonstrate the cleaning steps using code chunks. The complete data loading and merging code is included in my project Python file (Final Project.py). 
 
 ## Loading Data and Models
 
@@ -131,6 +131,8 @@ improvement = nba_all[nba_all["season"] == "2024-25"][["Team", "NRtg_change"]].d
 improvement = improvement.sort_values("NRtg_change", ascending=False)
 
 improvement.head(10).to_markdown()
+
+top_changes = improvement.head(10)
 
 plt.figure(figsize=(14,8))
 sns.barplot(data=top_changes, x="NRtg_change", y="Team", palette="viridis")
