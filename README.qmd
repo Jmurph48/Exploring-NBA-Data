@@ -38,6 +38,7 @@ nba_all["Team"] = nba_all["Team"].str.replace("*", "", regex=False).str.strip()
 nba_all = nba_all[nba_all["Team"] != "League Average"]
 
 nba_all = nba_all.reset_index(drop=True)
+nba_all
 ```
 
 ## Question 1: Which Advanced Stats Explain Winning?
